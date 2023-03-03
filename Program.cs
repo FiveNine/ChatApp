@@ -1,4 +1,6 @@
-﻿namespace ChatApp;
+﻿using System.Net;
+
+namespace ChatApp;
 
 public abstract class Program
 {
@@ -21,9 +23,25 @@ public abstract class Program
     public static void Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
+
         var configVarDict = LoadConfigVariables("../../../.env");
         
-        Console.WriteLine($"Client IP is {configVarDict["CLIENT_IP"]}");
-        Console.WriteLine($"Peer IP is {configVarDict["PEER_IP"]}");
+        switch (args[0])
+        {
+            case "c":
+                TcpClient client = new TcpClient();
+                client.Connect(
+                    new IPEndPoint(
+                        IPAddress.Parse(configVarDict["SERVER_IP"]), 
+                        int.Parse(configVarDict["SERVER_PORT"])
+                    )
+                );
+                break;
+            case "s":
+                TcpServer server = new TcpServer();
+                server.Listen();
+                break;
+        }
+        
     }
 }
