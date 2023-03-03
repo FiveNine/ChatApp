@@ -51,7 +51,7 @@ public class TcpServer
         
     }
 
-    private static String ReceiveMessage(Socket sock)
+    private static string ReceiveMessage(Socket sock)
     {
         var dataLengthBytes = new byte[sizeof(int)];
         sock.Receive(dataLengthBytes);
