@@ -49,7 +49,7 @@ public class TcpClient
         
     }
 
-    private static String ReceiveMessage(Socket sock)
+    private static string ReceiveMessage(Socket sock)
     {
         var dataLengthBytes = new byte[sizeof(int)];
         sock.Receive(dataLengthBytes);
@@ -59,7 +59,7 @@ public class TcpClient
         var totalDataReceived = 0;
         while (totalDataReceived < dataLength)
         {
-            int bytesReceived =
+            var bytesReceived =
                 sock.Receive(buffer, totalDataReceived, dataLength - totalDataReceived, SocketFlags.None);
             totalDataReceived += bytesReceived;
         }
