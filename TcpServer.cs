@@ -61,7 +61,7 @@ public class TcpServer
         var totalDataReceived = 0;
         while (totalDataReceived < dataLength)
         {
-            int bytesReceived =
+            var bytesReceived =
                 sock.Receive(buffer, totalDataReceived, dataLength - totalDataReceived, SocketFlags.None);
             totalDataReceived += bytesReceived;
         }
