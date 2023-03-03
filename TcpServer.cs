@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace ChatApp;
 public class TcpServer
@@ -22,10 +21,10 @@ public class TcpServer
             var clientSocket = listener.Accept();
             
             Console.WriteLine("Socket connected to -> {0}", clientSocket.RemoteEndPoint);
+
+            Console.WriteLine(SocketHandler.ReceiveMessage(clientSocket));
             
-            Console.WriteLine(ReceiveMessage(clientSocket));
-            
-            SendMessage(clientSocket, "Greetings from Server");
+            SocketHandler.SendMessage(clientSocket, "Greetings from Server");
             
             clientSocket.Shutdown(SocketShutdown.Both);
             clientSocket.Close();
@@ -34,38 +33,5 @@ public class TcpServer
         {
             Console.WriteLine(e);
         }
-    }
-    
-    private static void SendMessage(Socket sock, String message)
-    {
-        var rawData = Encoding.UTF8.GetBytes(message);
-        var dataLength = BitConverter.GetBytes(rawData.Length);
-        sock.Send(dataLength);
-        
-        var totalDataSent = 0;
-        while (totalDataSent < rawData.Length)
-        {
-            var bytesSent = sock.Send(rawData, totalDataSent, Math.Min(rawData.Length - totalDataSent, 1024), SocketFlags.None);
-            totalDataSent += bytesSent;
-        }
-        
-    }
-
-    private static String ReceiveMessage(Socket sock)
-    {
-        var dataLengthBytes = new byte[sizeof(int)];
-        sock.Receive(dataLengthBytes);
-        var dataLength = BitConverter.ToInt32(dataLengthBytes, 0);
-        
-        var buffer = new byte[dataLength];
-        var totalDataReceived = 0;
-        while (totalDataReceived < dataLength)
-        {
-            int bytesReceived =
-                sock.Receive(buffer, totalDataReceived, dataLength - totalDataReceived, SocketFlags.None);
-            totalDataReceived += bytesReceived;
-        }
-
-        return Encoding.UTF8.GetString(buffer);
     }
 }

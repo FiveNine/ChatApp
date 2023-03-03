@@ -25,23 +25,22 @@ public abstract class Program
         Console.WriteLine("Hello, World!");
 
         var configVarDict = LoadConfigVariables("../../../.env");
-        
+
         switch (args[0])
         {
             case "c":
-                TcpClient client = new TcpClient();
+                var client = new TcpClient();
                 client.Connect(
                     new IPEndPoint(
-                        IPAddress.Parse(configVarDict["SERVER_IP"]), 
+                        IPAddress.Parse(configVarDict["SERVER_IP"]),
                         int.Parse(configVarDict["SERVER_PORT"])
                     )
                 );
                 break;
             case "s":
-                TcpServer server = new TcpServer();
+                var server = new TcpServer();
                 server.Listen();
                 break;
         }
-        
     }
 }

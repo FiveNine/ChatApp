@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace ChatApp;
 public class TcpClient
@@ -14,56 +13,23 @@ public class TcpClient
 
     public void Connect(IPEndPoint endPoint)
     {
-        var sock = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-        sock.Bind(localEndPoint);
+        var socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        socket.Bind(localEndPoint);
         try
         {
-            sock.Connect(endPoint);
-            Console.WriteLine("Socket connected to -> {0}", sock.RemoteEndPoint);
+            socket.Connect(endPoint);
+            Console.WriteLine("Socket connected to -> {0}", socket.RemoteEndPoint);
             
-            SendMessage(sock, "Greetings from Client");
+            SocketHandler.SendMessage(socket, "Greetings from Client");
             
-            Console.WriteLine(ReceiveMessage(sock));
+            Console.WriteLine(SocketHandler.ReceiveMessage(socket));
             
-            sock.Shutdown(SocketShutdown.Both);
-            sock.Close();
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
         }
-    }
-    
-    private static void SendMessage(Socket sock, String message)
-    {
-        var rawData = Encoding.UTF8.GetBytes(message);
-        var dataLength = BitConverter.GetBytes(rawData.Length);
-        sock.Send(dataLength);
-        
-        var totalDataSent = 0;
-        while (totalDataSent < rawData.Length)
-        {
-            var bytesSent = sock.Send(rawData, totalDataSent, Math.Min(rawData.Length - totalDataSent, 1024), SocketFlags.None);
-            totalDataSent += bytesSent;
-        }
-        
-    }
-
-    private static string ReceiveMessage(Socket sock)
-    {
-        var dataLengthBytes = new byte[sizeof(int)];
-        sock.Receive(dataLengthBytes);
-        var dataLength = BitConverter.ToInt32(dataLengthBytes, 0);
-        
-        var buffer = new byte[dataLength];
-        var totalDataReceived = 0;
-        while (totalDataReceived < dataLength)
-        {
-            var bytesReceived =
-                sock.Receive(buffer, totalDataReceived, dataLength - totalDataReceived, SocketFlags.None);
-            totalDataReceived += bytesReceived;
-        }
-
-        return Encoding.UTF8.GetString(buffer);
     }
 }
