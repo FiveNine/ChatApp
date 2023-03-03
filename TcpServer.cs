@@ -36,7 +36,7 @@ public class TcpServer
         }
     }
     
-    private static void SendMessage(Socket sock, String message)
+    private static void SendMessage(Socket sock, string message)
     {
         var rawData = Encoding.UTF8.GetBytes(message);
         var dataLength = BitConverter.GetBytes(rawData.Length);
