@@ -3,9 +3,17 @@ using System.Text;
 
 namespace ChatApp;
 
+public enum Command
+{
+    Ping,
+    String,
+    ByteArray
+}
+
 public static class SocketHandler
 {
     private const int SendChuckSizeBytes = 1024;
+    private const int MaximumBufferSizeBytes = 1024 * 1024; 
 
     public static void SendMessage(Socket socket, string message)
     {
@@ -44,8 +52,14 @@ public static class SocketHandler
         var dataLengthBytes = new byte[4];
         socket.Receive(dataLengthBytes);
         var dataLength = BitConverter.ToInt32(dataLengthBytes, 0);
+
+        if (dataLength > MaximumBufferSizeBytes)
+        {
+            throw new Exception(
+                $"Tried to receive message of length {dataLength} bytes, maximum is {MaximumBufferSizeBytes}");
+        }
         
-        var buffer = new byte[dataLength]; // TODO: protect from potential allocation of 2 GB
+        var buffer = new byte[dataLength]; 
         
         var totalDataReceived = 0;
         while (totalDataReceived < dataLength)
