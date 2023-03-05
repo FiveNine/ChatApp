@@ -1,44 +1,38 @@
-﻿using System.Net.Sockets;
-using System.Text;
+﻿using System.Text;
 
-namespace ChatApp;
+namespace ChatApp.IO;
 
-public enum Command
+public static class ByteStreamHandler
 {
-    Ping,
-    String,
-    ByteArray
-}
-
-public static class SocketHandler
-{
+    
     private const int SendChuckSizeBytes = 1024;
-    private const int MaximumBufferSizeBytes = 1024 * 1024; 
-
-    public static void SendMessage(Socket socket, string message)
+    private const int MaximumBufferSizeBytes = 1024 * 1024;
+    
+    
+    public static void SendMessage(IByteStream byteStream, string message)
     {
-        SendBytes(socket, Encoding.UTF8.GetBytes(message));
+        WriteBytes(byteStream, Encoding.UTF8.GetBytes(message));
     }
 
-    public static string ReceiveMessage(Socket socket)
+    public static string ReceiveMessage(IByteStream byteStream)
     {
-        return Encoding.UTF8.GetString(ReceiveBytes(socket));
+        return Encoding.UTF8.GetString(ReadBytes(byteStream));
     }
 
     /// <summary>
     /// Sends an array of bytes prefixed by the length as a four byte signed integer
     /// </summary>
-    public static void SendBytes(Socket socket, byte[] bytes)
+    public static void WriteBytes(IByteStream byteStream, byte[] bytes)
     {
         var dataLengthBytes = BitConverter.GetBytes(bytes.Length);
         
-        socket.Send(dataLengthBytes);
+        byteStream.Write(dataLengthBytes);
         
         var totalDataSent = 0;
         while (totalDataSent < bytes.Length)
         {
-            var bytesSent = socket.Send(bytes, totalDataSent,
-                Math.Min(bytes.Length - totalDataSent, SendChuckSizeBytes), SocketFlags.None);
+            var bytesSent = byteStream.Write(bytes, totalDataSent,
+                Math.Min(bytes.Length - totalDataSent, SendChuckSizeBytes));
             totalDataSent += bytesSent;
         }
     }
@@ -47,10 +41,10 @@ public static class SocketHandler
     /// Receives an array of bytes prefixed by the length as a four byte signed integer
     /// </summary>
     /// <returns>The received byte array</returns>
-    public static byte[] ReceiveBytes(Socket socket)
+    public static byte[] ReadBytes(IByteStream byteStream)
     {
         var dataLengthBytes = new byte[4];
-        socket.Receive(dataLengthBytes);
+        byteStream.Read(dataLengthBytes);
         var dataLength = BitConverter.ToInt32(dataLengthBytes, 0);
 
         if (dataLength > MaximumBufferSizeBytes)
@@ -65,7 +59,7 @@ public static class SocketHandler
         while (totalDataReceived < dataLength)
         {
             var bytesReceived =
-                socket.Receive(buffer, totalDataReceived, dataLength - totalDataReceived, SocketFlags.None);
+                byteStream.Read(buffer, totalDataReceived, dataLength - totalDataReceived);
             totalDataReceived += bytesReceived;
         }
 

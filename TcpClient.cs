@@ -1,10 +1,12 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using ChatApp.IO;
 
 namespace ChatApp;
 public class TcpClient
 {
     private readonly IPEndPoint localEndPoint;
+    private SocketStream socketStream;
 
     public TcpClient()
     {
@@ -19,10 +21,11 @@ public class TcpClient
         {
             socket.Connect(endPoint);
             Console.WriteLine("Socket connected to -> {0}", socket.RemoteEndPoint);
+
+            socketStream = new SocketStream(socket);
             
-            SocketHandler.SendMessage(socket, "Greetings from Client");
-            
-            Console.WriteLine(SocketHandler.ReceiveMessage(socket));
+            ByteStreamHandler.SendMessage(socketStream, "Greetings from Client");
+            Console.WriteLine(ByteStreamHandler.ReceiveMessage(socketStream));
             
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();

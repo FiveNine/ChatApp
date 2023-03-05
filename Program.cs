@@ -26,6 +26,16 @@ public abstract class Program
 
         var configVarDict = LoadConfigVariables("../../../.env");
 
+        var peerAEndPoint = new IPEndPoint(
+            IPAddress.Parse(configVarDict["PEER_A_IP"]),
+            int.Parse(configVarDict["PEER_A_PORT"])
+        );
+
+        var peerBEndPoint = new IPEndPoint(
+            IPAddress.Parse(configVarDict["PEER_B_IP"]),
+            int.Parse(configVarDict["PEER_B_PORT"])
+        );
+
         switch (args[0])
         {
             case "c":
@@ -41,6 +51,16 @@ public abstract class Program
                 var server = new TcpServer();
                 server.Listen();
                 break;
+            case "a":
+            {
+                var peer = new TcpPeerClient(peerAEndPoint, "Alice");
+                peer.Connect(peerBEndPoint);
+            } break;
+            case "b":
+            {
+                var peer = new TcpPeerClient(peerBEndPoint, "Bob");
+                peer.Connect(peerAEndPoint);
+            } break;
         }
     }
 }
