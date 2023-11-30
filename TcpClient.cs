@@ -23,9 +23,14 @@ public class TcpClient
             Console.WriteLine("Socket connected to -> {0}", socket.RemoteEndPoint);
 
             socketStream = new SocketStream(socket);
-            
-            ByteStreamHandler.SendMessage(socketStream, "Greetings from Client");
-            Console.WriteLine(ByteStreamHandler.ReceiveMessage(socketStream));
+            while (true)
+            {
+                var input = Console.ReadLine();
+                ByteStreamHandler.SendMessage(socketStream, input);
+                if (input == "QUIT!") break;
+                var receivedMessage = ByteStreamHandler.ReceiveMessage(socketStream);
+                Console.WriteLine(receivedMessage);
+            }
             
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();

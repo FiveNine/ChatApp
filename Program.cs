@@ -22,9 +22,9 @@ public abstract class Program
 
     public static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        Console.WriteLine("Program started");
 
-        var configVarDict = LoadConfigVariables("../../../.env");
+        var configVarDict = LoadConfigVariables(".env");
 
         var peerAEndPoint = new IPEndPoint(
             IPAddress.Parse(configVarDict["PEER_A_IP"]),
@@ -39,6 +39,7 @@ public abstract class Program
         switch (args[0])
         {
             case "c":
+                Console.WriteLine("Role: Client");
                 var client = new TcpClient();
                 client.Connect(
                     new IPEndPoint(
@@ -48,16 +49,19 @@ public abstract class Program
                 );
                 break;
             case "s":
+                Console.WriteLine("Role: Server");
                 var server = new TcpServer();
                 server.Listen();
                 break;
             case "a":
             {
+                Console.WriteLine("Role: Alice");
                 var peer = new TcpPeerClient(peerAEndPoint, "Alice");
                 peer.Connect(peerBEndPoint);
             } break;
             case "b":
             {
+                Console.WriteLine("Role: Bob");
                 var peer = new TcpPeerClient(peerBEndPoint, "Bob");
                 peer.Connect(peerAEndPoint);
             } break;

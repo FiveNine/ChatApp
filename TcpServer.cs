@@ -26,8 +26,13 @@ public class TcpServer
 
             socketStream = new SocketStream(clientSocket);
 
-            Console.WriteLine(ByteStreamHandler.ReceiveMessage(socketStream));
-            ByteStreamHandler.SendMessage(socketStream, "Greetings from Server");
+            while (true)
+            {
+                var receivedMessage = ByteStreamHandler.ReceiveMessage(socketStream);
+                Console.WriteLine(receivedMessage);
+                if (receivedMessage == "QUIT!") break;
+                ByteStreamHandler.SendMessage(socketStream, $"Echo: {receivedMessage}");
+            }
             
             clientSocket.Shutdown(SocketShutdown.Both);
             clientSocket.Close();
