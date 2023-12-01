@@ -5,13 +5,8 @@ using ChatApp.IO;
 namespace ChatApp;
 public class TcpServer
 {
-    private readonly IPEndPoint localEndPoint;
+    private readonly IPEndPoint localEndPoint = new(IPAddress.Parse("0.0.0.0"), 59590);
     private SocketStream socketStream;
-    
-    public TcpServer()
-    {
-        localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 59590);
-    }
 
     public void Listen()
     {
@@ -20,6 +15,8 @@ public class TcpServer
         try
         {
             listener.Listen(10);
+            Console.WriteLine("Listening...");
+            
             var clientSocket = listener.Accept();
             
             Console.WriteLine("Socket connected to -> {0}", clientSocket.RemoteEndPoint);

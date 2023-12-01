@@ -5,13 +5,8 @@ using ChatApp.IO;
 namespace ChatApp;
 public class TcpClient
 {
-    private readonly IPEndPoint localEndPoint;
+    private readonly IPEndPoint localEndPoint = new(IPAddress.Parse("0.0.0.0"), 59591);
     private SocketStream socketStream;
-
-    public TcpClient()
-    {
-        localEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 59591);
-    }
 
     public void Connect(IPEndPoint endPoint)
     {
